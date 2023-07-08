@@ -17,7 +17,7 @@
           "strict": true
         },
         "@schematics/angular:component": {
-          "style": "scss"
+          "style": "less"
         }
       },
       "prefix": "app",
@@ -30,13 +30,14 @@
             "main": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
-            "inlineStyleLanguage": "scss",
+            "inlineStyleLanguage": "less",
             "assets": [
               "src/favicon.ico",
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.less",
+              "node_modules/ng-zorro-antd/ng-zorro-antd.less"
             ],
             "scripts": [],
             "customWebpackConfig": {
@@ -144,10 +145,11 @@
             "polyfills": "src/polyfills-test.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
-            "inlineStyleLanguage": "scss",
+            "inlineStyleLanguage": "less",
             "scripts": [],
             "styles": [
-              "src/styles.scss"
+              "src/styles.less",
+              "node_modules/ng-zorro-antd/ng-zorro-antd.less"
             ],
             "assets": [
               "src/favicon.ico",

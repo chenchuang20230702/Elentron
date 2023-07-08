@@ -2,6 +2,21 @@
   <h1 class="title">
     {{ 'PAGES.HOME.TITLE' | translate }}
   </h1>
-
+  <button nz-button nzType="primary">Primary Button</button>
+  <span nz-icon nzType="up-circle" nzTheme="twotone"></span>
+  <span nz-icon nzType="step-backward" nzTheme="fill"></span>
+  <span nz-icon nzType="step-backward" nzTheme="outline"></span>
+  <span nz-icon nzType="area-chart" nzTheme="outline"></span>
+  <span nz-icon nzType="wechat" nzTheme="outline"></span>
+  <span nz-icon [nzType]="'home'"></span>
   <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a>
+  <nz-space>
+    <nz-select *nzSpaceItem [(ngModel)]="mode">
+      <nz-option nzValue="date" nzLabel="Date"></nz-option>
+      <nz-option nzValue="week" nzLabel="Week"></nz-option>
+      <nz-option nzValue="month" nzLabel="Month"></nz-option>
+      <nz-option nzValue="year" nzLabel="Year"></nz-option>
+    </nz-select>
+    <nz-date-picker *nzSpaceItem [nzMode]="mode"></nz-date-picker>
+  </nz-space>
 </div>
