@@ -12,9 +12,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { HomeModule } from './home/home.module';
+import { HomeModule } from './view/home/home.module';
 import { DetailModule } from './detail/detail.module';
-
+import { LoginModule } from './view/login/login.module';
 import { AppComponent } from './app.component';
 
 // AoT requires an exported function for factories
@@ -32,6 +32,7 @@ const httpLoaderFactory = (http: HttpClient): TranslateHttpLoader =>  new Transl
     DetailModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    LoginModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

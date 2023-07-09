@@ -4,6 +4,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzInputModule } from 'ng-zorro-antd/input';
 // 引入全部的图标
 import { IconDefinition } from '@ant-design/icons-angular';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -16,7 +17,7 @@ import zh from '@angular/common/locales/zh';
 import {registerLocaleData} from '@angular/common';
 registerLocaleData(zh);
 @NgModule({
-  exports: [NzButtonModule,NzIconModule,NzDatePickerModule,NzSpaceModule,NzSelectModule],
+  exports: [NzButtonModule,NzIconModule,NzDatePickerModule,NzSpaceModule,NzSelectModule,NzInputModule],
   imports:[
     NzIconModule.forRoot(icons)
   ]
