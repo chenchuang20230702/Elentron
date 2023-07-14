@@ -1,22 +1,83 @@
-<div class="container">
-  <h1 class="title">
-    {{ 'PAGES.HOME.TITLE' | translate }}
-  </h1>
-  <button nz-button nzType="primary">Primary Button</button>
-  <span nz-icon nzType="up-circle" nzTheme="twotone"></span>
-  <span nz-icon nzType="step-backward" nzTheme="fill"></span>
-  <span nz-icon nzType="step-backward" nzTheme="outline"></span>
-  <span nz-icon nzType="area-chart" nzTheme="outline"></span>
-  <span nz-icon nzType="wechat" nzTheme="outline"></span>
-  <span nz-icon [nzType]="'home'"></span>
-  <a routerLink="/detail">{{ 'PAGES.HOME.GO_TO_DETAIL' | translate }}</a>
-  <nz-space>
-    <nz-select *nzSpaceItem [(ngModel)]="mode">
-      <nz-option nzValue="date" nzLabel="Date"></nz-option>
-      <nz-option nzValue="week" nzLabel="Week"></nz-option>
-      <nz-option nzValue="month" nzLabel="Month"></nz-option>
-      <nz-option nzValue="year" nzLabel="Year"></nz-option>
-    </nz-select>
-    <nz-date-picker *nzSpaceItem [nzMode]="mode"></nz-date-picker>
-  </nz-space>
+<div class="container-box">
+  <div class="header">
+    <div class="header-left">
+      <span class="lasttime">上次登录: {{info.lasttimes}}</span>
+    </div>
+    <div class="header-right">
+      <span class="name">{{info.name}}</span>
+      <span class="poweroff">
+        <span nz-icon nzType="edit" nzTheme="outline" (click)="edit()"></span>
+        &nbsp;&nbsp;
+        <span nz-icon nzType="poweroff" nzTheme="outline" (click)="out()"></span>
+      </span>
+    </div>
+  </div>
+  <div class="section-box">
+    <div class="content-details">
+      <div>
+        <div nz-col nzSpan="24">
+          <nz-date-picker nzMode="month" [nzAllowClear]="false" [(ngModel)]="selectDate" (ngModelChange)="onChange($event)"></nz-date-picker>
+          &nbsp;
+          <span class="total">该月总支出：{{monthTotall}}元</span>
+        </div>
+        <div nz-col nzSpan="24">
+          <nz-table #basicTable [nzScroll]="{ y: '200px' }" [nzShowPagination]="false" [nzData]="listOfData">
+            <thead>
+              <tr>
+                <th nzWidth="50px">日期</th>
+                <th nzWidth="50px">消费</th>
+                <th nzWidth="100px">明细</th>
+                <th nzWidth="20px">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of basicTable.data">
+                <td>{{ data.day }}</td>
+                <td>{{ data.money }}</td>
+                <td>
+                  <nz-tag *ngFor="let tag of data.details; let i = index">
+                    {{ tag.type }}：{{tag.money}}
+                  </nz-tag>
+                </td>
+                <td>
+                  <a>操作</a>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+    </div>
+    <div class="content-chart">
+      <div echarts [options]="chartOption" class="chart"></div>
+    </div>
+  </div>
 </div>
+<!-- 弹框 -->
+<nz-modal [(nzVisible)]="isVisible" nzTitle="编辑" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+  <ng-container *nzModalContent>
+    <div nz-row>
+      <div nz-col nzSpan="8"> 
+        <nz-date-picker [(ngModel)]="date"></nz-date-picker>
+      </div>
+      <div nz-col nzSpan="10">
+        <input placeholder="例: 早饭&20" nz-input [(ngModel)]="value" />
+      </div>
+      <div nz-col nzSpan="2">
+       <span class="add" (click)="add()">+</span>
+      </div>
+    </div>
+    <div nz-row>
+      <div nz-col nzSpan="20"> 
+       <ul class="details-box">
+        <li *ngFor="let item of options">
+          <span>
+            <i class="type">{{item.type}}</i>
+            <i class="money">{{item.money}}</i>
+          </span>
+        </li>
+       </ul>
+      </div>
+    </div>
+  </ng-container>
+</nz-modal>

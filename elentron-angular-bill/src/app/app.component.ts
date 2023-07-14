@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import { ElectronService } from './core/services';
 import { TranslateService } from '@ngx-translate/core';
 import { APP_CONFIG } from '../environments/environment';
-
+import { Router } from '@angular/router';
+import { Tools } from './shared/tools';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,7 +12,8 @@ import { APP_CONFIG } from '../environments/environment';
 export class AppComponent {
   constructor(
     private electronService: ElectronService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private router: Router
   ) {
     this.translate.setDefaultLang('en');
     console.log('APP_CONFIG', APP_CONFIG);
@@ -23,6 +25,10 @@ export class AppComponent {
       console.log('NodeJS childProcess', this.electronService.childProcess);
     } else {
       console.log('Run in browser');
+    }
+    let login = localStorage.getItem(Tools.LOGINIDKEY);
+    if(!login){
+      this.router.navigate(['login']);
     }
   }
 }

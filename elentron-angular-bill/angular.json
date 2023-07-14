@@ -39,7 +39,9 @@
               "src/styles.less",
               "node_modules/ng-zorro-antd/ng-zorro-antd.less"
             ],
-            "scripts": [],
+            "scripts": [
+              "node_modules/echarts/dist/echarts.js"
+            ],
             "customWebpackConfig": {
               "path": "./angular.webpack.js",
               "replaceDuplicatePlugins": true

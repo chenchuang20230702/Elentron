@@ -7,9 +7,25 @@ import { PageNotFoundComponent } from './components/';
 import { WebviewDirective } from './directives/';
 import { FormsModule } from '@angular/forms';
 import { NgZorroAntdModule } from './ng-zorro-antd.module';
+import * as echarts from 'echarts';
+import { NgxEchartsModule } from 'ngx-echarts';
 @NgModule({
   declarations: [PageNotFoundComponent, WebviewDirective],
-  imports: [CommonModule, TranslateModule, FormsModule, NgZorroAntdModule],
-  exports: [TranslateModule, WebviewDirective, FormsModule,NgZorroAntdModule]
+  imports: [
+    CommonModule,
+    TranslateModule,
+    FormsModule,
+    NgZorroAntdModule,
+    NgxEchartsModule.forRoot({
+      echarts
+    }),
+  ],
+  exports: [
+    TranslateModule,
+    WebviewDirective,
+    FormsModule,
+    NgZorroAntdModule,
+    NgxEchartsModule,
+  ],
 })
 export class SharedModule {}
