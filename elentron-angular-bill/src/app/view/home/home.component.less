@@ -67,6 +67,13 @@
         .total{
             font-weight: bold;
         }
+        .otherMoneyTitle{
+            cursor: pointer;
+            border: 1px solid transparent;
+            &:hover{
+                border-color: blueviolet;
+            }
+        }
     }
     .content-chart{
         height: calc(~'50% - 20px');
@@ -106,6 +113,19 @@
             }
             &.money{
                 background: #fff;
+            }
+        }
+        &:hover{
+            border-color: blueviolet;
+            .tag-box{
+                span{
+                    color: red;
+                }
+            }
+        }
+        .tag-box{
+            span{
+                cursor: pointer;
             }
         }
     }

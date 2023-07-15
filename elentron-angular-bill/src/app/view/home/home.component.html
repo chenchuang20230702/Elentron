@@ -19,9 +19,13 @@
           <nz-date-picker nzMode="month" [nzAllowClear]="false" [(ngModel)]="selectDate" (ngModelChange)="onChange($event)"></nz-date-picker>
           &nbsp;
           <span class="total">该月总支出：{{monthTotall}}元</span>
+          &nbsp;
+          <span class="total">吃饭支出：{{eatMoney}}元</span>
+          &nbsp;
+          <span class="total otherMoneyTitle" [title]="otherMoneyTitle">其他支出：{{otherMoney}}元</span>
         </div>
         <div nz-col nzSpan="24">
-          <nz-table #basicTable [nzScroll]="{ y: '200px' }" [nzShowPagination]="false" [nzData]="listOfData">
+          <nz-table #basicTable [nzFrontPagination]="false" [nzScroll]="{ y: '200px' }" [nzShowPagination]="false" [nzData]="listOfData">
             <thead>
               <tr>
                 <th nzWidth="50px">日期</th>
@@ -40,7 +44,7 @@
                   </nz-tag>
                 </td>
                 <td>
-                  <a>操作</a>
+                  <a (click)="edit(data)">操作</a>
                 </td>
               </tr>
             </tbody>
@@ -54,14 +58,14 @@
   </div>
 </div>
 <!-- 弹框 -->
-<nz-modal [(nzVisible)]="isVisible" nzTitle="编辑" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
+<nz-modal [(nzVisible)]="isVisible" [nzTitle]="title" (nzOnCancel)="handleCancel()" (nzOnOk)="handleOk()">
   <ng-container *nzModalContent>
     <div nz-row>
       <div nz-col nzSpan="8"> 
-        <nz-date-picker [(ngModel)]="date"></nz-date-picker>
+        <nz-date-picker [disabled]="isDisabled" [(ngModel)]="date"></nz-date-picker>
       </div>
       <div nz-col nzSpan="10">
-        <input placeholder="例: 早饭&20" nz-input [(ngModel)]="value" />
+        <input  placeholder="例: 早饭&20" nz-input [(ngModel)]="value" />
       </div>
       <div nz-col nzSpan="2">
        <span class="add" (click)="add()">+</span>
@@ -70,10 +74,11 @@
     <div nz-row>
       <div nz-col nzSpan="20"> 
        <ul class="details-box">
-        <li *ngFor="let item of options">
-          <span>
+        <li *ngFor="let item of options;let i=index">
+          <span class="tag-box">
             <i class="type">{{item.type}}</i>
             <i class="money">{{item.money}}</i>
+            <span nz-icon nzType="close" nzTheme="outline" (click)="delete(i)"></span>
           </span>
         </li>
        </ul>

@@ -21,7 +21,12 @@ export class HomeComponent implements OnInit {
   public selectDate = new Date();
   public result: Details[] = [];
   public monthTotall = 0;
+  public eatMoney = 0;//吃饭
+  public otherMoney = 0;//其它
+  public otherMoneyTitle = '';
   public listOfData:any[] = [];
+  public title = '新增';
+  public isDisabled = false;
   constructor(private router: Router, private message: NzMessageService) {
     console.log(localStorage.getItem(Tools.LOGINIDKEY));
   }
@@ -63,38 +68,53 @@ export class HomeComponent implements OnInit {
     //查询当前用户下的消费详情
     let list = await db.details.where('name').equals(this.info.name).toArray();
     //过滤当前日期
-
     this.result = list.filter((item) => item.month == month);
     //日期排序
     this.result.sort((a, b) => {
       return a.time > b.time ? 1 : -1;
     });
     //图表数据准备
-    this.monthTotall = 0;
+    this.monthTotall = 0; //月支出统计
+    this.eatMoney = 0; 
+    this.otherMoney = 0; 
+    this.otherMoneyTitle = '';
     this.datals = [];
+    this.listOfData = [];
+    let eatTypes = ['饭','外卖','聚餐']
     this.timels.forEach((t) => {
       let n = this.result.find((item) => item.time == t);
       let money = 0;
+      let eatMoney = 0;//吃饭
+      let otherMoney = 0;//其它
       if (n) {
         n.list.forEach((m) => {
           money = Number(money) + Number(m.money);
+          if(eatTypes.find(t=> m.type.includes(t))){
+            eatMoney = eatMoney + Number(m.money);
+          }else {
+            otherMoney = otherMoney + Number(m.money);
+            this.otherMoneyTitle = this.otherMoneyTitle + m.type + ':' + m.money + '\n';
+          }
         });
+        //月统计
         this.monthTotall = this.monthTotall + money;
-
+        this.eatMoney = this.eatMoney + eatMoney;
+        this.otherMoney = this.otherMoney + otherMoney;
         this.datals.push(money + '');
         //组装表格数据
         this.listOfData = [...this.listOfData,{
           day: n.time,
           money: money,
           details: n.list,
-        },
-        {
-          day: n.time,
-          money: money,
-          details: n.list,
         }];
         return;
       }
+      //组装表格数据
+      this.listOfData = [...this.listOfData,{
+        day: t,
+        money: null,
+        details: [],
+      }];
       this.datals.push(money ? money + '' : '');
     });
     //设置图标
@@ -148,9 +168,34 @@ export class HomeComponent implements OnInit {
     localStorage.clear();
     location.reload();
   }
-  edit() {
+  /**
+   * 
+   * @param data 新增 编辑
+   */
+  edit(data?:any) {
+    this.title = '新增'
+    this.isDisabled = false;
+    this.options = [];
+    this.date = new Date();
+    if(data){
+      this.title = '编辑'
+      this.date = new Date(`${data.day} 00:00:00`); 
+      this.isDisabled = true;
+      this.options = [...data.details]
+    }
     this.isVisible = true;
   }
+  /**
+   * 
+   * @param index 删除
+   */
+  delete(index:number){
+    console.log(index)
+    this.options.splice(index,1);
+  }
+  /**
+   * 取消
+   */
   handleCancel() {
     this.isVisible = false;
     this.options = [];
@@ -164,23 +209,35 @@ export class HomeComponent implements OnInit {
     let time = Tools.timestampToDateTime(this.date.getTime(), 'yyyy-MM-dd');
     //查询当前日期是否已经添加过
     let list = await db.details.where('time').equals(time).toArray();
-    let index = list.findIndex((item) => item.name == this.info.name);
-    if (index > -1) {
-      this.message.create('error', '当前日期已经添加过了');
-      return;
+    let its = list.find((item) => item.name == this.info.name);
+    //修改
+    if(this.isDisabled){
+      await db.details.update(its?.id,{
+        name: this.info.name,
+        time: time,
+        month: time.substring(0, 7),
+        list: this.options,
+      })
+    }else {
+      if (!its) {
+        this.message.create('error', '当前日期已经添加过了');
+        return;
+      }
+      await db.details.add({
+        name: this.info.name,
+        time: time,
+        month: time.substring(0, 7),
+        list: this.options,
+      });
     }
-    await db.details.add({
-      name: this.info.name,
-      time: time,
-      month: time.substring(0, 7),
-      list: this.options,
-    });
+
     this.message.create('success', '添加成功', {
       nzDuration: 2500,
     });
     this.isVisible = false;
     this.date = new Date();
     this.options = [];
+    this.getInfo();
   }
   add() {
     if (this.value) {
