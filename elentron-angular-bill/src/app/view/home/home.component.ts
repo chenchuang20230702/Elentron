@@ -1,17 +1,21 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { EChartsOption } from 'echarts';
+import { read, utils, writeFile,writeFileXLSX,readFile,WorkBook } from 'xlsx';
 import { Tools } from '../../shared/tools';
 import { db, User, List, Details } from '../../shared/db';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { ListOfDataTable,ExportXLSData,Titles,FieldsMap,YearsTable } from '../../app.model';
+import { truncate } from 'fs/promises';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.less'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit,AfterViewInit {
   public info: User = {};
   public chartOption: EChartsOption = {};
+  public chartOptionYear: EChartsOption = {};
   public isVisible = false;
   public date = new Date();
   public value = '';
@@ -24,7 +28,8 @@ export class HomeComponent implements OnInit {
   public eatMoney = 0;//吃饭
   public otherMoney = 0;//其它
   public otherMoneyTitle = '';
-  public listOfData:any[] = [];
+  public listOfDataTable:ListOfDataTable[] = [];
+  public yearsTable:YearsTable[] = [];
   public title = '新增';
   public isDisabled = false;
   constructor(private router: Router, private message: NzMessageService) {
@@ -32,6 +37,68 @@ export class HomeComponent implements OnInit {
   }
   ngOnInit(): void {
     this.getInfo();
+  }
+  ngAfterViewInit() {
+    const handleFile = async(e:any)=> {
+      const id = this.message.loading('Action in progress..', { nzDuration: 0 }).messageId;
+      const file = e.target.files[0];
+      e.target.value = null;
+      const data = await file.arrayBuffer();
+      const workbook = readFile(data,{type:"binary"});
+      const wsname = workbook.SheetNames[0];
+      const jsonData:any[] = utils.sheet_to_json(workbook.Sheets[wsname]);
+      let tabData: ListOfDataTable[] = [];
+      jsonData.forEach(item=>{
+        let obj = {} as any;
+        for(let key in item){
+          const k = (FieldsMap as any)[key]
+          obj[k] = item[key];
+          //类型单独处理
+          if(k == 'details'){
+            let dls:any = [];
+            let arr:string[] = item[key].split(',');
+            arr.forEach(t=>{
+              let d = t.split(':');
+              let details = {
+                money:d[1],
+                type:d[0]
+              }
+              dls.push(details);
+            })
+            obj[k] = dls;
+          }
+        }
+        tabData.push(obj);
+      });
+      console.log(workbook,'workbook')
+      console.log(jsonData,'jsonData')
+      console.log(tabData,'tabData')
+      //写入indexdb
+      for(let i = 0; i<tabData.length;i++){
+        let list = await db.details.where('time').equals(tabData[i].day).toArray();
+        let its = list.find((item) => item.name == this.info.name);
+        if(!!its){
+          setTimeout(() => {
+            this.message.remove(id);
+            this.message.create('error', '当月数据已存在,请手动维护');
+          }, 100);
+         return;
+        }
+        //新增
+        await db.details.add({
+          name: this.info.name,
+          time: tabData[i].day,
+          month: tabData[i].day.substring(0, 7),
+          list: tabData[i].details,
+        });
+      }
+      setTimeout(() => {
+        this.message.remove(id);
+        this.message.create('success', `导入成功`);
+      }, 100);
+    
+    }
+    document.getElementById("xlf")?.addEventListener("change", handleFile, false);
   }
   /**
    *
@@ -79,7 +146,7 @@ export class HomeComponent implements OnInit {
     this.otherMoney = 0; 
     this.otherMoneyTitle = '';
     this.datals = [];
-    this.listOfData = [];
+    this.listOfDataTable = [];
     let eatTypes = ['饭','外卖','聚餐']
     this.timels.forEach((t) => {
       let n = this.result.find((item) => item.time == t);
@@ -102,7 +169,7 @@ export class HomeComponent implements OnInit {
         this.otherMoney = this.otherMoney + otherMoney;
         this.datals.push(money + '');
         //组装表格数据
-        this.listOfData = [...this.listOfData,{
+        this.listOfDataTable = [...this.listOfDataTable,{
           day: n.time,
           money: money,
           details: n.list,
@@ -110,7 +177,7 @@ export class HomeComponent implements OnInit {
         return;
       }
       //组装表格数据
-      this.listOfData = [...this.listOfData,{
+      this.listOfDataTable = [...this.listOfDataTable,{
         day: t,
         money: null,
         details: [],
@@ -119,7 +186,33 @@ export class HomeComponent implements OnInit {
     });
     //设置图标
     this.setChartOption();
-    console.log(this.listOfData)
+    //组装当年的数据
+    let years = [];
+    let yearsData:number[] = [];
+    let year = Tools.timestampToDateTime(this.selectDate.getTime(), 'yyyy');
+    for(let y = 0;y <12;y++){
+      if(y < 9){
+        years.push(`${year}-0${y+1}`)
+      }else {
+        years.push(`${year}-${y+1}`)
+      }
+    }
+    //查询对应月份的数据
+    this.yearsTable= []
+    years.forEach(y=>{
+      yearsData.push(this.getMonth(y,list));
+    });
+    this.setYearChartOption(years,yearsData);
+  }
+  getMonth(month:string,result:Details[]){
+   let m = result.filter(item=> item.month == month);
+   let total = 0;
+   m.forEach(item=>{
+      item.list.forEach(m=>{
+        total = total + Number(m.money)
+      });
+   });
+   return total;
   }
   /**
    * 日期选择变化
@@ -160,6 +253,44 @@ export class HomeComponent implements OnInit {
         bottom: 50,
       },
     };
+  }
+  setYearChartOption(years:string[],data:number[]){
+    this.chartOptionYear = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        }
+      },
+      grid: {
+        top:'20',
+        left: '15',
+        right: '15',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: years
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: [
+        {
+          data: data,
+          type: 'bar',
+          showBackground: true,
+          backgroundStyle: {
+            color: 'rgba(180, 180, 180, 0.2)'
+          },
+          label:{
+            show:true,
+            position: 'top'
+          }
+        }
+      ]
+    }
   }
   /**
    * 退出登录
@@ -252,5 +383,53 @@ export class HomeComponent implements OnInit {
         this.message.create('error', '填写不符合规范');
       }
     }
+  }
+  createWs(data:ExportXLSData[],fields:string[],titles:any){
+    //创建表格实例
+    const ws = utils.json_to_sheet(data,{
+      header: fields
+    });
+    //表格设置宽度
+    ws["!cols"] = [
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 100 }
+    ]
+    //设置表头
+    const range = utils.decode_range((ws['!ref']) as string);
+    for(let c = range.s.c; c <= range.e.c; c++){
+      const header = utils.encode_col(c) + '1';
+      ws[header].v = titles[ws[header].v];
+    }
+    return ws;
+  }
+  /**
+   * 导出当前页
+   */
+  async downLoad(){
+    console.log(this.listOfDataTable,'listOfDataTable');
+   let exportList: ExportXLSData[] = [];
+    for(let item of this.listOfDataTable){
+      let exportData = {} as ExportXLSData;
+      exportData.day = item.day;
+      exportData.money = item.money;
+      exportData.details = ''
+      item.details.forEach(t=>{
+        exportData.details =  exportData.details + ',' + t.type + ':' + t.money;
+      });
+      exportData.details = exportData.details.slice(1);
+      exportList.push(exportData); 
+    }
+    const fields:string[] = ['day','money','details']
+    const titles:Titles = {
+      day:'日期',
+      money:'消费',
+      details:'明细'
+    }
+    const ws = this.createWs(exportList, fields, titles)
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "sheet");
+    let month = Tools.timestampToDateTime(this.selectDate.getTime(), 'yyyy-MM');
+    writeFileXLSX(wb, `${month}个人消费账单_支出${this.monthTotall}.xlsx`);
   }
 }

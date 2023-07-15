@@ -6,6 +6,11 @@
     <div class="header-right">
       <span class="name">{{info.name}}</span>
       <span class="poweroff">
+        <label for="xlf">
+          <span class="import" title="导入数据" nz-icon nzType="to-top" nzTheme="outline"></span>
+        </label>
+        <input [hidden]="true" type="file" name="xlfile" id="xlf" />
+        &nbsp;&nbsp;
         <span nz-icon nzType="edit" nzTheme="outline" (click)="edit()"></span>
         &nbsp;&nbsp;
         <span nz-icon nzType="poweroff" nzTheme="outline" (click)="out()"></span>
@@ -14,7 +19,7 @@
   </div>
   <div class="section-box">
     <div class="content-details">
-      <div>
+      <div class="table-left">
         <div nz-col nzSpan="24">
           <nz-date-picker nzMode="month" [nzAllowClear]="false" [(ngModel)]="selectDate" (ngModelChange)="onChange($event)"></nz-date-picker>
           &nbsp;
@@ -23,15 +28,18 @@
           <span class="total">吃饭支出：{{eatMoney}}元</span>
           &nbsp;
           <span class="total otherMoneyTitle" [title]="otherMoneyTitle">其他支出：{{otherMoney}}元</span>
+          &nbsp;
+          <span class="export" title="导出当前页数据" nz-icon nzType="download" nzTheme="outline" (click)="downLoad()"></span>
+          &nbsp;
         </div>
         <div nz-col nzSpan="24">
-          <nz-table #basicTable [nzFrontPagination]="false" [nzScroll]="{ y: '200px' }" [nzShowPagination]="false" [nzData]="listOfData">
+          <nz-table #basicTable [nzFrontPagination]="false" [nzScroll]="{ y: '195px' }" [nzShowPagination]="false" [nzData]="listOfDataTable">
             <thead>
               <tr>
                 <th nzWidth="50px">日期</th>
                 <th nzWidth="50px">消费</th>
                 <th nzWidth="100px">明细</th>
-                <th nzWidth="20px">操作</th>
+                <th nzWidth="50px">操作</th>
               </tr>
             </thead>
             <tbody>
@@ -50,6 +58,25 @@
             </tbody>
           </nz-table>
         </div>
+      </div>
+      <div class="table-right">
+        <!-- <div nz-col nzSpan="24">
+          <nz-table #yearTable [nzFrontPagination]="false" [nzScroll]="{ y: '200px' }" [nzShowPagination]="false" [nzData]="yearsTable">
+            <thead>
+              <tr>
+                <th>月份</th>
+                <th>消费</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let data of yearTable.data">
+                <td>{{ data.month }}</td>
+                <td>{{ data.total }}</td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div> -->
+        <div echarts [options]="chartOptionYear" class="chart"></div>
       </div>
     </div>
     <div class="content-chart">
