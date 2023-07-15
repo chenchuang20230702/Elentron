@@ -38,7 +38,7 @@ export class LoginComponent implements OnInit {
     }
     let exist = user.find((item) => item.password == this.userpassword);
     if (!exist) {
-      this.message.create('error', '密码错误');
+      this.message.create('error', '关联手机号错误');
       return;
     }
     this.message.create('success', '登录成功', {
@@ -63,13 +63,13 @@ export class LoginComponent implements OnInit {
         this.message.create('error', '请输入用户名称');
         break;
       case !!this.signUserpassword:
-        this.message.create('error', '请输入密码');
+        this.message.create('error', '请输入手机号');
         break;
       case !!this.signUserpassword2:
-        this.message.create('error', '请输入确认密码');
+        this.message.create('error', '请输入确认手机号');
         break;
       case this.signUserpassword == this.signUserpassword2:
-        this.message.create('error', '两次密码输入不一样，请重新输入');
+        this.message.create('error', '两次手机号输入不一样，请重新输入');
         break;
       default:
         //查询本地是否存在该用户

@@ -11,6 +11,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 // 引入全部的图标
 import { IconDefinition } from '@ant-design/icons-angular';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -37,7 +38,8 @@ registerLocaleData(zh);
     NzGridModule,
     NzModalModule,
     NzTableModule,
-    NzTagModule
+    NzTagModule,
+    NzPopconfirmModule
   ],
   imports: [NzIconModule.forRoot(icons)],
 })

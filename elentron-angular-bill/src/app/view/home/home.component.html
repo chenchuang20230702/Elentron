@@ -2,6 +2,8 @@
   <div class="header">
     <div class="header-left">
       <span class="lasttime">上次登录: {{info.lasttimes}}</span>
+      &nbsp;&nbsp;
+      <a nz-popconfirm nzPopconfirmTitle="确定要清空所有数据 包括登录的用户？" nzPopconfirmPlacement="bottom" (nzOnConfirm)="deleteAll()">一键清库</a>
     </div>
     <div class="header-right">
       <span class="name">{{info.name}}</span>

@@ -7,18 +7,18 @@
         <form action="" class="login">
           <h1>欢迎回来<label for="change"> <span nz-icon nzType="user-add" nzTheme="outline"></span></label></h1>
           <input type="text" name="username" nz-input [(ngModel)]="username" placeholder="用户名">
-          <input type="password" name="userpassword" nz-input [(ngModel)]="userpassword" placeholder="密码">
+          <input type="password" name="userpassword" nz-input [(ngModel)]="userpassword" placeholder="手机号">
           <input type="submit" class="btn" value="登 录" (click)="login()">
         </form>
         <form action="" class="sign">
           <h1>加入我们<label for="change"> <span nz-icon nzType="swap" nzTheme="outline"></span></label></h1>
           <input type="text" name="signUsername" nz-input [(ngModel)]="signUsername" placeholder="用户名">
-          <input type="password" name="signUserpassword" nz-input [(ngModel)]="signUserpassword" placeholder="密码">
-          <input type="password" name="signUserpassword2" nz-input [(ngModel)]="signUserpassword2" placeholder="确认密码">
+          <input type="password" name="signUserpassword" nz-input [(ngModel)]="signUserpassword" placeholder="手机号">
+          <input type="password" name="signUserpassword2" nz-input [(ngModel)]="signUserpassword2" placeholder="手机号">
           <input type="submit" class="btn" value="注 册" (click)="sign()">
         </form>
       </div>
     </div>
   </div>
 </div>
-<canvas id="sakura"></canvas>
+<!-- <canvas id="sakura"></canvas> -->

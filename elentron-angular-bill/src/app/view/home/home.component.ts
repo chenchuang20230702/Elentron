@@ -432,4 +432,14 @@ export class HomeComponent implements OnInit,AfterViewInit {
     let month = Tools.timestampToDateTime(this.selectDate.getTime(), 'yyyy-MM');
     writeFileXLSX(wb, `${month}个人消费账单_支出${this.monthTotall}.xlsx`);
   }
+  /**
+   * 一键清库
+   */
+  async deleteAll(){
+    await db.delete();
+    this.message.create('success', '清库成功');
+    setTimeout(() => {
+      this.out();
+    }, 1500);
+  }
 }
