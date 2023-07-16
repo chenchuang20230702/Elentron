@@ -9,6 +9,7 @@
     "!*.map",
     "!package.json",
     "!package-lock.json",
+    "launch.html",
     {
       "from": "../dist",
       "filter": ["**/*"]

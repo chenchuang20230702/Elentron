@@ -1,9 +1,9 @@
-import {app, BrowserWindow, screen} from 'electron';
+import {app, BrowserWindow, screen } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-
 let win: BrowserWindow | null = null;
 let showWin: BrowserWindow | null = null;
+
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
@@ -27,22 +27,23 @@ function createWindow(): BrowserWindow {
   });
   showWin = new BrowserWindow({
     width: 500,
-    height: 300,
-    frame:false,
+    height: 400,
     transparent:true,
-    alwaysOnTop:true
+    frame:false
   });
   if (serve) {
+    //浏览器环境
     const debug = require('electron-debug');
     debug();
-
     require('electron-reloader')(module);
-    showWin.loadURL(`file://${__dirname}/launch.html`);
+    showWin.loadFile(path.join(__dirname, 'launch.html'));
     win.loadURL('http://localhost:4200');
   } else {
-    // Path when running electron executable
+    // electron 环境Path when running electron executable
+    //加载启动页面
+    showWin.loadFile(path.join(__dirname, 'launch.html'));
+    //加载主页面
     let pathIndex = './index.html';
-
     if (fs.existsSync(path.join(__dirname, '../dist/index.html'))) {
        // Path when running electron in local folder
       pathIndex = '../dist/index.html';
@@ -55,6 +56,7 @@ function createWindow(): BrowserWindow {
     setTimeout(() => {
       showWin?.destroy();
       win?.show();
+      showWin = null;
     }, 200);
   });
   // Emitted when the window is closed.
@@ -64,8 +66,6 @@ function createWindow(): BrowserWindow {
     // when you should delete the corresponding element.
     win = null;
   });
-  
-
   return win;
 }
 

@@ -33,7 +33,8 @@
             "inlineStyleLanguage": "less",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/launch.html"
             ],
             "styles": [
               "src/styles.less",
