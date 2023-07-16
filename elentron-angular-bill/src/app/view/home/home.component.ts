@@ -350,7 +350,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
         list: this.options,
       })
     }else {
-      if (!its) {
+      if (its) {
         this.message.create('error', '当前日期已经添加过了');
         return;
       }
