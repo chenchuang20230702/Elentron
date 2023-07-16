@@ -297,7 +297,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
    */
   out() {
     localStorage.clear();
-    location.reload();
+    this.router.navigate(['login']);
   }
   /**
    * 

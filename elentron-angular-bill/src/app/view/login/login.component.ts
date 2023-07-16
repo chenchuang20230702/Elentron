@@ -27,11 +27,14 @@ export class LoginComponent implements OnInit {
 
   async login() {
     console.log(this.username, this.userpassword);
-    //查询当前用户是否在库中
-    let user = await db.userInfos
-      .where('name')
-      .equals(this.username)
-      .toArray();
+    let user: any[] = [];
+    try {
+      //查询当前用户是否在库中
+      user = await db.userInfos.where('name').equals(this.username).toArray();
+    } catch (error) {
+      this.message.create('error', '请重启客户端');
+      return;
+    }
     if (user.length == 0) {
       this.message.create('error', '该用户未注册');
       return;
@@ -45,11 +48,11 @@ export class LoginComponent implements OnInit {
       nzDuration: 2500,
     });
     //更新登录时间
-    await db.userInfos.update(exist.id,{
+    await db.userInfos.update(exist.id, {
       lasttimes: exist.times,
-      times: Tools.timestampToDateTime()
+      times: Tools.timestampToDateTime(),
     });
-    localStorage.setItem(Tools.LOGINIDKEY,this.username)
+    localStorage.setItem(Tools.LOGINIDKEY, this.username);
     this.router.navigate(['home']);
   }
   async sign() {
@@ -72,11 +75,17 @@ export class LoginComponent implements OnInit {
         this.message.create('error', '两次手机号输入不一样，请重新输入');
         break;
       default:
-        //查询本地是否存在该用户
-        let user = await db.userInfos
-          .where('name')
-          .equals(this.signUsername)
-          .toArray();
+        let user: any[] = [];
+        try {
+          //查询本地是否存在该用户
+          user = await db.userInfos
+            .where('name')
+            .equals(this.signUsername)
+            .toArray();
+        } catch (error) {
+          this.message.create('error', '请重启客户端');
+          return;
+        }
         let index = user.findIndex((item) => item.name == this.signUsername);
         if (index > -1) {
           this.message.create('error', '该用户已经注册');

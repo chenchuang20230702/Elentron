@@ -49,7 +49,7 @@ export class ElectronService {
       // https://www.electronjs.org/docs/latest/api/ipc-renderer#ipcrendererinvokechannel-args
     }
   }
-
+  
   get isElectron(): boolean {
     return !!(window && window.process && window.process.type);
   }
