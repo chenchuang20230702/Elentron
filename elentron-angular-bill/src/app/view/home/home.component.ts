@@ -40,7 +40,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
   }
   ngAfterViewInit() {
     const handleFile = async(e:any)=> {
-      const id = this.message.loading('Action in progress..', { nzDuration: 0 }).messageId;
+      const id = this.message.loading('导入中..', { nzDuration: 0 }).messageId;
       const file = e.target.files[0];
       e.target.value = null;
       const data = await file.arrayBuffer();
@@ -59,21 +59,21 @@ export class HomeComponent implements OnInit,AfterViewInit {
             let arr:string[] = item[key].split(',');
             arr.forEach(t=>{
               let d = t.split(':');
-              let details = {
-                money:d[1],
-                type:d[0]
+              if(d[0] || d[1]){
+                let details = {
+                  money:d[1] || '',
+                  type:d[0] || ''
+                }
+                dls.push(details);
               }
-              dls.push(details);
             })
             obj[k] = dls;
           }
         }
         tabData.push(obj);
       });
-      console.log(workbook,'workbook')
-      console.log(jsonData,'jsonData')
-      console.log(tabData,'tabData')
       //写入indexdb
+      let month_ = tabData[0].day.substring(0, 7);
       for(let i = 0; i<tabData.length;i++){
         let list = await db.details.where('time').equals(tabData[i].day).toArray();
         let its = list.find((item) => item.name == this.info.name);
@@ -94,7 +94,10 @@ export class HomeComponent implements OnInit,AfterViewInit {
       }
       setTimeout(() => {
         this.message.remove(id);
-        this.message.create('success', `导入成功`);
+        this.message.create('success', `${month_}导入成功`,{
+          nzDuration: 2500,
+        });
+        this.getInfo();
       }, 100);
     
     }
@@ -167,11 +170,11 @@ export class HomeComponent implements OnInit,AfterViewInit {
         this.monthTotall = this.monthTotall + money;
         this.eatMoney = this.eatMoney + eatMoney;
         this.otherMoney = this.otherMoney + otherMoney;
-        this.datals.push(Number(money).toFixed(2) + '');
+        this.datals.push(money ? Number(money).toFixed(2): '');
         //组装表格数据
         this.listOfDataTable = [...this.listOfDataTable,{
           day: n.time,
-          money: (money).toFixed(2),
+          money: money ? Number(money).toFixed(2) : '',
           details: n.list,
         }];
         return;
@@ -183,12 +186,14 @@ export class HomeComponent implements OnInit,AfterViewInit {
         details: [],
       }];
       this.datals.push(money ? Number(money).toFixed(2) + '' : '');
+    
     });
     //精度设置
     this.monthTotall = Number(this.monthTotall).toFixed(2) as any;
     this.eatMoney = Number(this.eatMoney).toFixed(2) as any;
     this.otherMoney = Number(this.otherMoney).toFixed(2) as any;
     //设置图标
+    console.log(this.datals,'this.datals')
     this.setChartOption();
     //组装当年的数据
     let years = [];
@@ -231,7 +236,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
         formatter: (params: any) => {
           let axisValue = params[0].axisValue;
           let items = this.result.find((item) => item.time == axisValue);
-          let str = '';
+          let str = axisValue + '<br/>';
           items?.list.forEach((t) => {
             str += t.type + ':' + t.money + '<br/>';
           });
@@ -441,7 +446,9 @@ export class HomeComponent implements OnInit,AfterViewInit {
    */
   async deleteAll(){
     await db.delete();
-    this.message.create('success', '清库成功');
+    this.message.create('success', '清库成功，请关闭客户端重新登录',{
+      nzDuration:3000
+    });
     setTimeout(() => {
       this.out();
     }, 1500);
