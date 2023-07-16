@@ -167,11 +167,11 @@ export class HomeComponent implements OnInit,AfterViewInit {
         this.monthTotall = this.monthTotall + money;
         this.eatMoney = this.eatMoney + eatMoney;
         this.otherMoney = this.otherMoney + otherMoney;
-        this.datals.push(money + '');
+        this.datals.push(Number(money).toFixed(2) + '');
         //组装表格数据
         this.listOfDataTable = [...this.listOfDataTable,{
           day: n.time,
-          money: money,
+          money: (money).toFixed(2),
           details: n.list,
         }];
         return;
@@ -182,13 +182,17 @@ export class HomeComponent implements OnInit,AfterViewInit {
         money: null,
         details: [],
       }];
-      this.datals.push(money ? money + '' : '');
+      this.datals.push(money ? Number(money).toFixed(2) + '' : '');
     });
+    //精度设置
+    this.monthTotall = Number(this.monthTotall).toFixed(2) as any;
+    this.eatMoney = Number(this.eatMoney).toFixed(2) as any;
+    this.otherMoney = Number(this.otherMoney).toFixed(2) as any;
     //设置图标
     this.setChartOption();
     //组装当年的数据
     let years = [];
-    let yearsData:number[] = [];
+    let yearsData:string[] = [];
     let year = Tools.timestampToDateTime(this.selectDate.getTime(), 'yyyy');
     for(let y = 0;y <12;y++){
       if(y < 9){
@@ -212,7 +216,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
         total = total + Number(m.money)
       });
    });
-   return total;
+   return Number(total).toFixed(2);
   }
   /**
    * 日期选择变化
@@ -254,7 +258,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
       },
     };
   }
-  setYearChartOption(years:string[],data:number[]){
+  setYearChartOption(years:string[],data:string[]){
     this.chartOptionYear = {
       tooltip: {
         trigger: 'axis',
