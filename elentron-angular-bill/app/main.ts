@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 let win: BrowserWindow | null = null;
+let showWin: BrowserWindow | null = null;
 const args = process.argv.slice(1),
   serve = args.some(val => val === '--serve');
 
@@ -16,18 +17,27 @@ function createWindow(): BrowserWindow {
     y: 0,
     width: size.width,
     height: size.height,
+    // autoHideMenuBar:true,
+    show:false,
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: (serve),
       contextIsolation: false,
     },
   });
-
+  showWin = new BrowserWindow({
+    width: 500,
+    height: 300,
+    frame:false,
+    transparent:true,
+    alwaysOnTop:true
+  });
   if (serve) {
     const debug = require('electron-debug');
     debug();
 
     require('electron-reloader')(module);
+    showWin.loadURL(`file://${__dirname}/launch.html`);
     win.loadURL('http://localhost:4200');
   } else {
     // Path when running electron executable
@@ -41,7 +51,12 @@ function createWindow(): BrowserWindow {
     const url = new URL(path.join('file:', __dirname, pathIndex));
     win.loadURL(url.href);
   }
-
+  win.once('ready-to-show',()=>{
+    setTimeout(() => {
+      showWin?.destroy();
+      win?.show();
+    }, 200);
+  });
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store window
@@ -49,6 +64,7 @@ function createWindow(): BrowserWindow {
     // when you should delete the corresponding element.
     win = null;
   });
+  
 
   return win;
 }

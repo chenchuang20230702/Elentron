@@ -15,13 +15,13 @@
     }
   ],
   "win": {
-    "icon": "dist/assets/icons",
+    "icon": "dist/assets/icons/favicon.ico",
     "target": [
       "portable"
     ]
   },
   "portable": {
-    "splashImage": "dist/assets/icons/bill.bmp"
+    "splashImage": "dist/assets/icons/favicon.bmp"
   },
   "mac": {
     "icon": "dist/assets/icons",
