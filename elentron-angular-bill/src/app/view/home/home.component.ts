@@ -32,8 +32,12 @@ export class HomeComponent implements OnInit,AfterViewInit {
   public yearsTable:YearsTable[] = [];
   public title = '新增';
   public isDisabled = false;
+  public eatTypes = ['饭','外卖','聚餐','返现','夜宵'];
   constructor(private router: Router, private message: NzMessageService) {
     console.log(localStorage.getItem(Tools.LOGINIDKEY));
+  }
+  getTitle(){
+    return `吃饭支出只统计：${this.eatTypes.join(',')}`
   }
   ngOnInit(): void {
     this.getInfo();
@@ -150,7 +154,6 @@ export class HomeComponent implements OnInit,AfterViewInit {
     this.otherMoneyTitle = '';
     this.datals = [];
     this.listOfDataTable = [];
-    let eatTypes = ['饭','外卖','聚餐']
     this.timels.forEach((t) => {
       let n = this.result.find((item) => item.time == t);
       let money = 0;
@@ -159,7 +162,7 @@ export class HomeComponent implements OnInit,AfterViewInit {
       if (n) {
         n.list.forEach((m) => {
           money = Number(money) + Number(m.money);
-          if(eatTypes.find(t=> m.type.includes(t))){
+          if(this.eatTypes.find(t=> m.type.includes(t))){
             eatMoney = eatMoney + Number(m.money);
           }else {
             otherMoney = otherMoney + Number(m.money);
@@ -235,12 +238,13 @@ export class HomeComponent implements OnInit,AfterViewInit {
         trigger: 'axis',
         formatter: (params: any) => {
           let axisValue = params[0].axisValue;
+          let value = params[0].value;
           let items = this.result.find((item) => item.time == axisValue);
           let str = axisValue + '<br/>';
           items?.list.forEach((t) => {
             str += t.type + ':' + t.money + '<br/>';
           });
-          return str;
+          return '当日总计：' + value + '<br/>' + str;
         },
       },
       xAxis: {
@@ -254,6 +258,9 @@ export class HomeComponent implements OnInit,AfterViewInit {
         {
           data: this.datals,
           type: 'line',
+          label:{
+            show:true
+          }
         },
       ],
       grid: {
